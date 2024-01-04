@@ -1,0 +1,116 @@
+Create table tblPersonel
+
+(personelID int NOT NULL,
+ ADI varchar(50) NOT NULL ,
+ SOYADI varchar (50) NOT NULL ,
+ TELEFON char (10) NOT NULL , --Başında 0 olmadan giriniz
+ EFOSTA varchar (50) NOT NULL ,
+ TCKİMLİKNO char (11) NOT NULL ,
+ DepartmanID int NOT NULL ,
+ SIFRE int NOT NULL ,
+ GÖREVI varchar (50)  NOT NULL )
+
+
+ select * from tblPersonel
+
+ -- Edit Top 200 Rows ile tblPersonel  tablosuna veri girişi yaptık.
+
+
+
+ Create table tblMaas
+
+ (
+ 
+ maasID int identity (1,1) NOT NULL  ,
+ MAAS int NOT NULL,
+ PersonelID int NOT NULL,
+ )
+
+ select* from tblMaas
+
+ --Maas tablosuna tarih satırını ekleyelim
+
+ ALTER TABLE  tblMaas ADD Tarih date 
+
+
+ create table  tblDepartman 
+
+ (DeparmanID int NOT NULL,
+  Departman varchar(50) NOT NULL
+  )
+
+  --Tablomuza veri girişi yapıyoruz
+
+  select * from tblDepartman
+
+  --Database diagrams'tan tablolar arasında primary key foreign key ilişkisi kuruldu
+
+  --ÖRNEK SORULAR--
+
+  --1) burakacar@gmail.com e-postasına sahip personelin şifresini bulunuz.
+
+  select ADI,SOYADI,SIFRE from tblPersonel where EPOSTA = 'burakacar@gmail.com'
+
+  --2)soyadında Acar olan öğrencileri listeleyiniz
+
+  select * from tblPersonel where SOYADI = 'Acar'
+
+  --3)adında e harfi geçen personelleri listeleyiniz
+
+  select * from tblPersonel where  ADI like '%e%'
+
+  --4)552 ile başlayan telefom numaralarını 555 ile değiştiriniz
+
+  update tblPersonel set TELEFON = '555'+ substring(TELEFON,4,10)
+
+  where TELEFON like '552%'
+
+  select * from tblPersonel
+  --5)  Departman tablosuna  ”Pazarlama”  departmanını ekleyiniz.
+ 
+ insert into tblDepartman (Departman) 
+ values ('Pazarlama')
+
+ select * from tblDepartman
+
+ --6) TC Kimlik numarası 25614785369 olan öğrencinin adını Kemal Yıldız olarak değiştiriniz
+
+ update tblPersonel set ADI ='Kemal' , SOYADI ='Yıldız' where TCKİMLİKNO =25614785369
+
+
+ --7) 58946987414 TC kimlik numarasına sahip kişinin toplam maaşını'2017-01-01 - 2022-12-01 tarihleri arasında
+ --listeleyen sorguyu yazınız
+
+ select sum(MAAS) from tblPersonel p , tblMaas m
+
+ where p.PersonelID = m.PersonelID
+ and m.tarih>='2017-01-01' AND m.tarih<= '2022-12-01'
+ and p.TCKİMLİKNO = 58946987414
+ --8)Personelin Adını, Soyadını, Departmanını ve Maaşını listeleyiniz.
+
+ select p.ADI , p.SOYADI , d.DEPARTMAN , m.MAAS from tblPersonel p, tblDepartman d , tblMaas m
+
+ where
+
+ p.PersonelID = m.PersonelID and
+ p.DepartmanID = d.DepartmanID
+
+ --9)Departmanların Toplam Maaşlarına göre büyükten küçüğe sıralayınız
+
+ select d.DEPARTMAN , sum(m.MAAS) from tblMaas m , tblDepartman d , tblPersonel p
+ where
+
+p.PersonelID = m.PersonelID and
+p.DepartmanID = d.DepartmanID
+
+group by d.DEPARTMAN
+order by sum(m.MAAS) DESC
+
+--10) Her departmanda kaç kişi çalıştığını DEPARTMAN, ÇALIŞAN SAYISI şeklinde listeleyiniz.
+
+select d.DEPARTMAN , COUNT ( p.PersonelID) as 'Çalışan Sayısı' from tblDepartman d , tblPersonel p
+
+where
+
+p.DepartmanID =d.DepartmanID
+group by d.DEPARTMAN
